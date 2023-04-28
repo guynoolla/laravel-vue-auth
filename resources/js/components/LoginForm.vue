@@ -56,9 +56,9 @@
                         let errors = [];
                         for (const key in data.errors) {
                             if (errors.length > 0) {
-                                errors[key] = data.errors[key].join(" ");
+                                errors[key] = data.errors[key].join(" ").toString();
                             } else {
-                                errors[key] = data.errors[key];
+                                errors[key] = data.errors[key].toString();
                             }
                         }
                         this.errors = errors;

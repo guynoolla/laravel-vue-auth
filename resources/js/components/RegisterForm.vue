@@ -79,7 +79,7 @@
                     } else {
                         let errors = [];
                         for (const key in data.errors) {
-                            errors[key] = data.errors[key].join(" ");
+                            errors[key] = data.errors[key].join(" ").toString();
                         }
                         this.errors = errors;
                     }
