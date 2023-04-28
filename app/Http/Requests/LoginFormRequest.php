@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+use App\DbLog\AuthDbLog;
 
 class LoginFormRequest extends FormRequest
 {
@@ -31,6 +32,8 @@ class LoginFormRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
+        AuthDbLog::authFailed($validator->errors());
+
         throw new HttpResponseException(response()->json(
             [
                 'status' => false,

@@ -72,16 +72,16 @@
 
                 }).then((res) => {
                     const data = res.data;
+                    console.log('data', data);
 
-                    if (!data.status) {
+                    if (data.status) {
+                        window.location.replace(data.redirect);
+                    } else {
                         let errors = [];
                         for (const key in data.errors) {
                             errors[key] = data.errors[key].join(" ");
                         }
                         this.errors = errors;
-
-                    } else {
-                        window.location.replace(data.redirect);
                     }
                 });
             }

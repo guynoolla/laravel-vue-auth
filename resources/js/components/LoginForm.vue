@@ -2,7 +2,7 @@
     <form @submit.prevent="onSubmit">
         <slot></slot>
 
-        <div class="text-danger font-weight-bold py-4">{{ errors.invalid_credentials }}</div>
+        <div class="text-danger py-4">{{ errors.invalid_credentials }}</div>
 
         <div class="form-group row">
             <label for="email" class="col-md-4 col-form-label text-md-right">Email адрес</label>
@@ -48,16 +48,20 @@
 
                 }).then((res) => {
                     const data = res.data;
+                    console.log('data', data);
 
-                    if (!data.status) {
+                    if (data.status) {
+                        window.location.replace(data.redirect);
+                    } else {
                         let errors = [];
                         for (const key in data.errors) {
-                            errors[key] = data.errors[key].join(" ");
+                            if (errors.length > 0) {
+                                errors[key] = data.errors[key].join(" ");
+                            } else {
+                                errors[key] = data.errors[key];
+                            }
                         }
                         this.errors = errors;
-
-                    } else {
-                        window.location.replace(data.redirect);
                     }
                 });
             }

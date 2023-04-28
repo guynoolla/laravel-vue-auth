@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RegisterFormRequest;
 use App\Http\Requests\LoginFormRequest;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Session;
 use App\Models\User;
+use App\Models\AuthLog;
+use App\DbLog\AuthDbLog;
+use Session;
 use Hash;
 
 class AuthController extends Controller
@@ -29,18 +31,24 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => $request->password
         ])) {
+
+            $user = User::where('email', $request->email)->first();
+            AuthDbLog::authSuccess($user);
+            $request->session()->put('success', 'Авторизация прошла успешно!');
+
             return response()->json([
                 "status" => true,
                 "redirect" => url("dashboard")
             ]);
+
         } else {
+
+            $errors["invalid_credentials"] = "Недействительные учётные данные";
+            AuthDbLog::authFailed($errors);
+
             return response()->json([
                 "status" => false,
-                "errors" => [
-                    "invalid_credentials" => "Недействительные учётные данные",
-                    "email" => $request->email,
-                    "password" => $request->password
-                ]
+                "errors" => $errors
             ]);
         }
     }
@@ -55,6 +63,8 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+        AuthDbLog::authSuccess($user);
+        $request->session()->put('success', 'Отлично, регистрация завершена!');
 
         return response()->json([
             "status" => true,
@@ -62,13 +72,15 @@ class AuthController extends Controller
         ]);
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        if(Auth::check()){
-            return view('dashboard');
+        if (Auth::check()){
+            $message = $request->session()->get('success');
+            $request->session()->forget('success');
+            return view('dashboard', ['success' => $message]);
         }
 
-        return redirect("login")->withSuccess('Opps! You do not have access');
+        return redirect("login")->withFail('Упс! у вас нет доступа.');
     }
 
     public function create(array $data)
