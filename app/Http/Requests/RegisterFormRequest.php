@@ -3,8 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+
 use App\DbLog\AuthDbLog;
 
 class RegisterFormRequest extends FormRequest
@@ -19,7 +21,7 @@ class RegisterFormRequest extends FormRequest
         return [
             'first_name' => ['required', 'max:100'],
             'last_name' => ['required', 'max:100'],
-            'email' => ['required', 'email', 'unique:users'],
+            'email' => ['required', 'email:rfc,dns,filter', 'unique:users'],
             'password' => ['required', 'min:6'],
             'confirm_password' => ['required', 'min:6', 'same:password'],
         ];
@@ -41,12 +43,11 @@ class RegisterFormRequest extends FormRequest
     {
         AuthDbLog::authFailed($validator->errors());
 
-        //throw new HttpResponseException(response()->json(
-        resonse()->json(
-            [
+        throw new HttpResponseException(
+            response()->json([
                 'status' => false,
-                'errors' => $validator->errors()
-            ], 200);
-        //);
+                'errors' => $validator->errors(), 422
+            ])
+        );
     }
 }

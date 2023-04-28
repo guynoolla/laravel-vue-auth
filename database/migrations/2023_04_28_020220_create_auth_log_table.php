@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('user_ip');
             $table->tinyInteger('status');
-            $table->string('errors')->nullable();
+            $table->text('errors')->nullable();
             $table->timestamps();
         });
     }

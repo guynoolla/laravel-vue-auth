@@ -34,11 +34,11 @@ class LoginFormRequest extends FormRequest
     {
         AuthDbLog::authFailed($validator->errors());
 
-        throw new HttpResponseException(response()->json(
-            [
+        throw new HttpResponseException(
+            response()->json([
                 'status' => false,
-                'errors' => $validator->errors()
-            ], 200)
+                'errors' => $validator->errors(), 400
+            ])
         );
     }
 }
